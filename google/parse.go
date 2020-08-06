@@ -10,9 +10,9 @@ import (
 
 const (
 	organicClasses = "div.rc"
-	organicTitleClasses = "h3.LC20lb"
-	organicURLClasses = "div.rc > div > a"
-	organicDisplayURLClasses = "div.TbwUpd > cite"
+	organicTitleClasses = "div.rc > div.r h3"
+	organicURLClasses = "div.rc > div.r > a"
+	organicDisplayURLClasses = "div.rc cite"
 	organicDescriptionClasses = "span.st"
 )
 
@@ -45,7 +45,7 @@ func ParseGoogleResult(r io.Reader) (res *Serp, err error) {
 		})
 	})
 
-	searchNode.Find("div.cbphWd").Each(func(i int, el *goquery.Selection) {
+	searchNode.Find("div.related-question-pair div.hide-focus-ring:last-child").Each(func(i int, el *goquery.Selection) {
 		res.RelatedQuestions = append(res.RelatedQuestions, el.Text())
 	})
 
@@ -82,10 +82,14 @@ func ParseGoogleResult(r io.Reader) (res *Serp, err error) {
 	})
 
 	doc.Find("tr[valign='top'] > td").Each(func(i int, el *goquery.Selection) {
-		if el.HasClass("YyVfkd") {
-			res.Pagination.Current, err = strconv.ParseInt(el.Text(), 0, 64)
-		} else if el.HasClass("d6cvqb") {
+		if el.Text() == "" {
+			return
+		}
+
+		if el.Is("td[role='heading']") {
 			res.Pagination.Next = el.Find("a").AttrOr("href", "")
+		} else if el.AttrOr("class", "") != "" {
+			res.Pagination.Current, err = strconv.ParseInt(el.Text(), 0, 64)
 		} else {
 			href := el.Find("a").AttrOr("href", "")
 			res.Pagination.OtherPages = append(res.Pagination.OtherPages, href)
