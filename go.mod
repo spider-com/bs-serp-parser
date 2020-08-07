@@ -1,4 +1,4 @@
-module github.com/braintree-go/braintree-go
+module github.com/spider-com/bs-serp-parser
 
 go 1.14
 
