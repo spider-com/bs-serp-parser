@@ -14,6 +14,7 @@ const (
 	organicURLClasses = "div.rc > div.r > a"
 	organicDisplayURLClasses = "div.rc cite"
 	organicDescriptionClasses = "span.st"
+	domain = "https://www.google.com"
 )
 
 func Parse(r io.Reader) (*Serp, error) {
@@ -86,16 +87,24 @@ func Parse(r io.Reader) (*Serp, error) {
 		}
 
 		if el.Is("td[role='heading']") {
-			res.Pagination.Next = el.Find("a").AttrOr("href", "")
+			res.Pagination.Next = getFullHref(el)
 		} else if el.AttrOr("class", "") != "" {
 			res.Pagination.Current, err = strconv.ParseInt(el.Text(), 0, 64)
 		} else {
-			href := el.Find("a").AttrOr("href", "")
-			res.Pagination.OtherPages = append(res.Pagination.OtherPages, href)
+			res.Pagination.OtherPages = append(res.Pagination.OtherPages, getFullHref(el))
 		}
 	})
 
 	return res, nil
+}
+
+func getFullHref(el *goquery.Selection) string {
+	href := el.Find("a").AttrOr("href", "")
+	if strings.HasPrefix(href, "/search") {
+		href = domain + href
+	}
+
+	return href
 }
 
 
