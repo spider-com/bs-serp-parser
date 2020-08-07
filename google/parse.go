@@ -16,14 +16,13 @@ const (
 	organicDescriptionClasses = "span.st"
 )
 
-func ParseGoogleResult(r io.Reader) (res *Serp, err error) {
+func Parse(r io.Reader) (*Serp, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res = &Serp{}
-
+	res := &Serp{}
 	resultStats := doc.Find("div#result-stats")
 	matches := regexp.MustCompile(`\d+(,\d+)*`).FindAllString(resultStats.Text(), -1)
 	if len(matches) > 0 {

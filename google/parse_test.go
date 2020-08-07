@@ -7,11 +7,11 @@ import (
 	"testing"
 )
 
-func TestParseGoogleResult(t *testing.T) {
-	googleDoc, err := ioutil.ReadFile("./index.html")
+func TestParse(t *testing.T) {
+	googleDoc, err := ioutil.ReadFile("./ads.html")
 	require.Nil(t, err)
 
-	res, err := ParseGoogleResult(bytes.NewReader(googleDoc))
+	res, err := Parse(bytes.NewReader(googleDoc))
 	require.Nil(t, err)
 
 	require.Equal(t, int64(3530000000), res.TotalResultCount)
