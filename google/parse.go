@@ -2,6 +2,7 @@ package google
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	serp "github.com/spider-com/bs-serp-parser"
 	"io"
 	"regexp"
 	"strconv"
@@ -87,24 +88,16 @@ func Parse(r io.Reader) (*Serp, error) {
 		}
 
 		if el.Is("td[role='heading']") {
-			res.Pagination.Next = getFullHref(el)
+			res.Pagination.Next = serp.PrependDomainToHRef(domain, el.Find("a").AttrOr("href", ""))
 		} else if el.AttrOr("class", "") != "" {
 			res.Pagination.Current, err = strconv.ParseInt(el.Text(), 0, 64)
 		} else {
-			res.Pagination.OtherPages = append(res.Pagination.OtherPages, getFullHref(el))
+			href := el.Find("a").AttrOr("href", "")
+			res.Pagination.OtherPages = append(res.Pagination.OtherPages, serp.PrependDomainToHRef(domain, href))
 		}
 	})
 
 	return res, nil
-}
-
-func getFullHref(el *goquery.Selection) string {
-	href := el.Find("a").AttrOr("href", "")
-	if strings.HasPrefix(href, "/search") {
-		href = domain + href
-	}
-
-	return href
 }
 
 

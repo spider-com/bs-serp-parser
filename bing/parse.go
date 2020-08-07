@@ -2,10 +2,15 @@ package bing
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	serp "github.com/spider-com/bs-serp-parser"
 	"io"
 	"regexp"
 	"strconv"
 	"strings"
+)
+
+const (
+	domain = "https://www.bing.com"
 )
 
 var (
@@ -71,20 +76,24 @@ func Parse(r io.Reader) (*Serp, error) {
 		res.RelatedQuestions = append(res.RelatedQuestions, el.Text())
 	})
 
-	pagination := doc.Find("li.b_pag")
-	res.Pagination.Current, err = strconv.ParseInt(pagination.Find("a.sb_pagS_bp").Text(), 0, 64)
+	pag := doc.Find("li.b_pag")
+	res.Pagination.Current, err = strconv.ParseInt(pag.Find("a.sb_pagS_bp").Text(), 0, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	res.Pagination.Next = pagination.Find("a.sb_pagN").AttrOr("href", "")
-	pagination.Find("a.sb_bp").Each(func(i int, el *goquery.Selection) {
+	pag.Find("a.sb_bp").Each(func(i int, el *goquery.Selection) {
 		href := el.AttrOr("href", "")
-		if href == "" || href == res.Pagination.Next {
+		if href == "" {
 			return
 		}
 
-		res.Pagination.OtherPages = append(res.Pagination.OtherPages, href)
+		href = serp.PrependDomainToHRef(domain, href)
+		if el.HasClass("sb_pagN") {
+			res.Pagination.Next = href
+		} else {
+			res.Pagination.OtherPages = append(res.Pagination.OtherPages, href)
+		}
 	})
 
 	return res, nil
