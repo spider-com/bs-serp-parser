@@ -1,8 +1,9 @@
 package google
 
 import (
+	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
-	serp "github.com/spider-com/bs-serp-parser"
+	ut "github.com/spider-com/bs-serp-parser"
 	"io"
 	"regexp"
 	"strconv"
@@ -18,13 +19,22 @@ const (
 	domain = "https://www.google.com"
 )
 
-func Parse(r io.Reader) (*Serp, error) {
+func ParseJSON(r io.Reader) (res []byte, err error) {
+	v, err := parse(r)
+	if err != nil {
+		return
+	}
+
+	return json.Marshal(v)
+}
+
+func parse(r io.Reader) (*serp, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &Serp{}
+	res := &serp{}
 	resultStats := doc.Find("div#result-stats")
 	matches := regexp.MustCompile(`\d+(,\d+)*`).FindAllString(resultStats.Text(), -1)
 	if len(matches) > 0 {
@@ -36,7 +46,7 @@ func Parse(r io.Reader) (*Serp, error) {
 
 	searchNode := doc.Find("div > div#search")
 	searchNode.Find(organicClasses).Each(func(pos int, el *goquery.Selection) {
-		res.OrganicItems = append(res.OrganicItems, Item{
+		res.OrganicItems = append(res.OrganicItems, item{
 			Position:        pos,
 			PositionOverall: pos,
 			Title:           el.Find(organicTitleClasses).Text(),
@@ -53,7 +63,7 @@ func Parse(r io.Reader) (*Serp, error) {
 	doc.Find("div.top-pla-group-inner").
 		Find("div.pla-unit-container").
 		Each(func(i int, el *goquery.Selection) {
-			res.TopPLAItems = append(res.TopPLAItems, PLAItem{
+			res.TopPLAItems = append(res.TopPLAItems, plaItem{
 				URL:    el.Find("div.pla-unit-title > a:last-child").AttrOr("href", ""),
 				Title:  el.Find("a.pla-unit-title-link").Text(),
 				Source: el.Find("div.LbUacb > span.VZqTOd").Text(),
@@ -64,7 +74,7 @@ func Parse(r io.Reader) (*Serp, error) {
 	doc.Find("div.commercial-unit-desktop-rhs").
 		Find("div.pla-unit-container").
 		Each(func(i int, el *goquery.Selection) {
-			res.CommercialUnitPlA = append(res.CommercialUnitPlA, PLAItem{
+			res.CommercialUnitPLA = append(res.CommercialUnitPLA, plaItem{
 				URL:    el.Find("div.pla-unit-title > a:last-child").AttrOr("href", ""),
 				Title:  el.Find("a.pla-unit-title-link").Text(),
 				Source: el.Find("div.LbUacb > span.VZqTOd").Text(),
@@ -74,7 +84,7 @@ func Parse(r io.Reader) (*Serp, error) {
 
 	doc.Find("#tads ol > li").Each(func(i int, el *goquery.Selection) {
 		// selectors depend on where tads was taken from, this one is a top under PLA items
-		res.PaidItems = append(res.PaidItems, PaidItem{
+		res.PaidItems = append(res.PaidItems, paidItem{
 			Position:    i,
 			Title:       el.Find("div[role='heading']").Text(),
 			URL:         el.Find("a[data-ved]").AttrOr("href", ""),
@@ -88,12 +98,12 @@ func Parse(r io.Reader) (*Serp, error) {
 		}
 
 		if el.Is("td[role='heading']") {
-			res.Pagination.Next = serp.PrependDomainToHRef(domain, el.Find("a").AttrOr("href", ""))
+			res.Pagination.Next = ut.PrependDomainToHRef(domain, el.Find("a").AttrOr("href", ""))
 		} else if el.AttrOr("class", "") != "" {
 			res.Pagination.Current, err = strconv.ParseInt(el.Text(), 0, 64)
 		} else {
 			href := el.Find("a").AttrOr("href", "")
-			res.Pagination.OtherPages = append(res.Pagination.OtherPages, serp.PrependDomainToHRef(domain, href))
+			res.Pagination.OtherPages = append(res.Pagination.OtherPages, ut.PrependDomainToHRef(domain, href))
 		}
 	})
 

@@ -11,7 +11,7 @@ func TestParse(t *testing.T) {
 	googleDoc, err := ioutil.ReadFile("./index.html")
 	require.Nil(t, err)
 
-	res, err := Parse(bytes.NewReader(googleDoc))
+	res, err := parse(bytes.NewReader(googleDoc))
 	require.Nil(t, err)
 
 	require.Equal(t, int64(3530000000), res.TotalResultCount)

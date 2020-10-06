@@ -1,40 +1,40 @@
 package google
 
-type Item struct {
-	Position int
-	PositionOverall int
-	Description string
-	Title string
-	URL string
-	DisplayURL string
+type item struct {
+	Position        int    `json:"position"`
+	PositionOverall int    `json:"positionOverall"`
+	Description     string `json:"description"`
+	Title           string `json:"title"`
+	URL             string `json:"url"`
+	DisplayURL      string `json:"displayURL"`
 }
 
-type PaidItem struct {
-	Position int
-	Description string
-	Title string
-	URL string
+type paidItem struct {
+	Position    int    `json:"position"`
+	Description string `json:"description"`
+	Title       string `json:"title"`
+	URL         string `json:"url"`
 }
 
-type PLAItem struct {
-	URL string
-	Title string
-	Source string
-	Price string
+type plaItem struct {
+	URL    string `json:"url"`
+	Title  string `json:"title"`
+	Source string `json:"source"`
+	Price  string `json:"price"`
 }
 
-type Pagination struct {
-	Current int64
-	Next string
-	OtherPages []string
+type pagination struct {
+	Current    int64    `json:"current"`
+	Next       string   `json:"next"`
+	OtherPages []string `json:"otherPages"`
 }
 
-type Serp struct {
-	TotalResultCount int64
-	OrganicItems []Item
-	PaidItems []PaidItem
-	TopPLAItems []PLAItem
-	CommercialUnitPlA []PLAItem
-	RelatedQuestions []string
-	Pagination Pagination
+type serp struct {
+	TotalResultCount  int64      `json:"totalResultCount"`
+	OrganicItems      []item     `json:"organicItems"`
+	PaidItems         []paidItem `json:"paidItems"`
+	TopPLAItems       []plaItem  `json:"topPLAItems"`
+	CommercialUnitPLA []plaItem  `json:"commercialUnitPLA"`
+	RelatedQuestions  []string   `json:"relatedQuestions"`
+	Pagination        pagination `json:"pagination"`
 }
