@@ -1,8 +1,9 @@
 package bing
 
 import (
+	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
-	serp "github.com/spider-com/bs-serp-parser"
+	ut "github.com/spider-com/bs-serp-parser"
 	"io"
 	"regexp"
 	"strconv"
@@ -17,13 +18,22 @@ var (
 	specialPages = []string{"wikipedia"}
 )
 
-func Parse(r io.Reader) (*Serp, error) {
+func ParseJSON(r io.Reader) (res []byte, err error) {
+	v, err := parse(r)
+	if err != nil {
+		return
+	}
+
+	return json.Marshal(v)
+}
+
+func parse(r io.Reader) (*serp, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &Serp{}
+	res := &serp{}
 	resultStats := doc.Find("span.sb_count")
 	matches := regexp.MustCompile(`\d+(,\d+)*`).FindAllString(resultStats.Text(), -1)
 	if len(matches) > 0 {
@@ -34,7 +44,7 @@ func Parse(r io.Reader) (*Serp, error) {
 	}
 
 	doc.Find("#b_results > li.b_ad:first-child div.sb_add").Each(func(i int, el *goquery.Selection) {
-		res.AdItems = append(res.AdItems, Item{
+		res.AdItems = append(res.AdItems, item{
 			Position:        i,
 			PositionOverall: i,
 			Description:     el.Find(".b_caption > p").Text(),
@@ -51,7 +61,7 @@ func Parse(r io.Reader) (*Serp, error) {
 			}
 		}
 
-		res.Items = append(res.Items, Item{
+		res.Items = append(res.Items, item{
 			Position:        i,
 			PositionOverall: res.CountItems(),
 			Description:     el.Find(".b_caption > p").Text(),
@@ -62,7 +72,7 @@ func Parse(r io.Reader) (*Serp, error) {
 	})
 
 	doc.Find("#b_results > li.b_adBottom div.sb_add").Each(func(i int, el *goquery.Selection) {
-		res.AdBottomItems = append(res.AdBottomItems, Item{
+		res.AdBottomItems = append(res.AdBottomItems, item{
 			Position:        i,
 			PositionOverall: res.CountItems(),
 			Description:     el.Find(".b_caption > p").Text(),
@@ -88,7 +98,7 @@ func Parse(r io.Reader) (*Serp, error) {
 			return
 		}
 
-		href = serp.PrependDomainToHRef(domain, href)
+		href = ut.PrependDomainToHRef(domain, href)
 		if el.HasClass("sb_pagN") {
 			res.Pagination.Next = href
 		} else {

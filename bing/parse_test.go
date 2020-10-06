@@ -11,7 +11,7 @@ func TestParseAds(t *testing.T) {
 	googleDoc, err := ioutil.ReadFile("./assets/ads.html")
 	require.Nil(t, err)
 
-	res, err := Parse(bytes.NewReader(googleDoc))
+	res, err := parse(bytes.NewReader(googleDoc))
 	require.Nil(t, err)
 
 	// some pages with ads don't have result count
