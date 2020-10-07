@@ -12,10 +12,10 @@ import (
 
 const (
 	organicClasses = "div.rc"
-	organicTitleClasses = "div.rc > div.r h3"
-	organicURLClasses = "div.rc > div.r > a"
+	organicTitleClasses = "div.rc > div > * > h3 > span"
+	organicURLClasses = "div.rc > div > a"
 	organicDisplayURLClasses = "div.rc cite"
-	organicDescriptionClasses = "span.st"
+	organicDescriptionClasses = "div.rc > div span > span"
 	domain = "https://www.google.com"
 )
 
