@@ -1,7 +1,6 @@
 package google
 
 import (
-	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
 	ut "github.com/spider-com/bs-serp-parser"
 	"io"
@@ -11,30 +10,16 @@ import (
 )
 
 const (
-	organicClasses = "div.rc"
-	organicTitleClasses = "div.rc > div > * > h3 > span"
-	organicURLClasses = "div.rc > div > a"
-	organicDisplayURLClasses = "div.rc cite"
-	organicDescriptionClasses = "div.rc > div span > span"
 	domain = "https://www.google.com"
 )
 
-func ParseJSON(r io.Reader) (res []byte, err error) {
-	v, err := parse(r)
-	if err != nil {
-		return
-	}
-
-	return json.Marshal(v)
-}
-
-func parse(r io.Reader) (*serp, error) {
+func parse(r io.Reader) (*desktopSerp, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &serp{}
+	res := &desktopSerp{}
 	resultStats := doc.Find("div#result-stats")
 	matches := regexp.MustCompile(`\d+(,\d+)*`).FindAllString(resultStats.Text(), -1)
 	if len(matches) > 0 {
@@ -45,17 +30,16 @@ func parse(r io.Reader) (*serp, error) {
 	}
 
 	searchNode := doc.Find("div > div#search")
-	searchNode.Find(organicClasses).Each(func(pos int, el *goquery.Selection) {
+	searchNode.Find("div.rc").Each(func(pos int, el *goquery.Selection) {
 		res.OrganicItems = append(res.OrganicItems, item{
-			Position:        pos,
-			PositionOverall: pos,
-			Title:           el.Find(organicTitleClasses).Text(),
-			DisplayURL:      el.Find(organicDisplayURLClasses).Text(),
-			Description:     el.Find(organicDescriptionClasses).Text(),
-			URL: el.Find(organicURLClasses).AttrOr("href", ""),
+				Position:        pos,
+				PositionOverall: pos,
+				Title:           el.Find("div.rc > div > * > h3 > span").Text(),
+				DisplayURL:      el.Find("div.rc cite").Text(),
+				Description:     el.Find("div.rc > div span > span").Text(),
+				URL: el.Find("div.rc > div > a").AttrOr("href", ""),
 		})
 	})
-
 	searchNode.Find("div.related-question-pair div.hide-focus-ring:last-child").Each(func(i int, el *goquery.Selection) {
 		res.RelatedQuestions = append(res.RelatedQuestions, el.Text())
 	})
