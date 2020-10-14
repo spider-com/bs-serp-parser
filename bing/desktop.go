@@ -1,7 +1,6 @@
 package bing
 
 import (
-	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
 	ut "github.com/spider-com/bs-serp-parser"
 	"io"
@@ -17,15 +16,6 @@ const (
 var (
 	specialPages = []string{"wikipedia"}
 )
-
-func ParseJSON(r io.Reader) (res []byte, err error) {
-	v, err := parse(r)
-	if err != nil {
-		return
-	}
-
-	return json.Marshal(v)
-}
 
 func parse(r io.Reader) (*serp, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
@@ -71,6 +61,10 @@ func parse(r io.Reader) (*serp, error) {
 		})
 	})
 
+	doc.Find("div.b_rich .b_vlist2col > ul > li").Each(func(i int, el *goquery.Selection) {
+		res.RelatedQuestions = append(res.RelatedQuestions, el.Text())
+	})
+
 	doc.Find("#b_results > li.b_adBottom div.sb_add").Each(func(i int, el *goquery.Selection) {
 		res.AdBottomItems = append(res.AdBottomItems, item{
 			Position:        i,
@@ -80,10 +74,6 @@ func parse(r io.Reader) (*serp, error) {
 			URL:             el.Find(".b_caption > div cite").Text(),
 			DisplayURL:      el.Find(".b_caption > div cite").Text(),
 		})
-	})
-
-	doc.Find("div.b_rich .b_vlist2col > ul > li").Each(func(i int, el *goquery.Selection) {
-		res.RelatedQuestions = append(res.RelatedQuestions, el.Text())
 	})
 
 	pag := doc.Find("li.b_pag")

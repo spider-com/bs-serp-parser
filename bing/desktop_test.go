@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestParseAds(t *testing.T) {
-	googleDoc, err := ioutil.ReadFile("./assets/ads.html")
+func TestParse(t *testing.T) {
+	googleDoc, err := ioutil.ReadFile("./desktop.html")
 	require.Nil(t, err)
 
 	res, err := parse(bytes.NewReader(googleDoc))
