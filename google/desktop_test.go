@@ -8,7 +8,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	googleDoc, err := ioutil.ReadFile("./index.html")
+	googleDoc, err := ioutil.ReadFile("./desktop.html")
 	require.Nil(t, err)
 
 	res, err := parse(bytes.NewReader(googleDoc))

@@ -29,12 +29,22 @@ type pagination struct {
 	OtherPages []string `json:"otherPages"`
 }
 
-type serp struct {
-	TotalResultCount  int64      `json:"totalResultCount"`
+type desktopSerp struct {
+	RelatedQuestions  []string   `json:"relatedQuestions"`
 	OrganicItems      []item     `json:"organicItems"`
+	TotalResultCount  int64      `json:"totalResultCount"`
 	PaidItems         []paidItem `json:"paidItems"`
 	TopPLAItems       []plaItem  `json:"topPLAItems"`
 	CommercialUnitPLA []plaItem  `json:"commercialUnitPLA"`
-	RelatedQuestions  []string   `json:"relatedQuestions"`
 	Pagination        pagination `json:"pagination"`
+}
+
+type mobileItem struct {
+	item
+	IsAMP bool
+}
+
+type mobileSerp struct {
+	RelatedQuestions []string     `json:"relatedQuestions"`
+	OrganicItems     []mobileItem `json:"organicItems"`
 }
