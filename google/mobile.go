@@ -5,13 +5,13 @@ import (
 	"io"
 )
 
-func parseMobile(r io.Reader) (*mobileSerp, error) {
+func parseMobile(r io.Reader) (*serpMobile, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &mobileSerp{}
+	res := &serpMobile{}
 	searchNode := doc.Find("div#rso")
 	searchNode.Find("div.U3THc").Each(func(pos int, el *goquery.Selection) {
 		ampSpan := el.Find(`div.mnr-c > div > div > div:first-child > a > div > span:last-child`)

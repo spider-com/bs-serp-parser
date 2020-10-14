@@ -29,7 +29,7 @@ type pagination struct {
 	OtherPages []string `json:"otherPages"`
 }
 
-type desktopSerp struct {
+type serpDesktop struct {
 	RelatedQuestions  []string   `json:"relatedQuestions"`
 	OrganicItems      []item     `json:"organicItems"`
 	TotalResultCount  int64      `json:"totalResultCount"`
@@ -44,7 +44,7 @@ type mobileItem struct {
 	IsAMP bool
 }
 
-type mobileSerp struct {
+type serpMobile struct {
 	RelatedQuestions []string     `json:"relatedQuestions"`
 	OrganicItems     []mobileItem `json:"organicItems"`
 }
