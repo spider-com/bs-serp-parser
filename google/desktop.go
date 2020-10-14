@@ -13,13 +13,13 @@ const (
 	domain = "https://www.google.com"
 )
 
-func parse(r io.Reader) (*desktopSerp, error) {
+func parseDesktop(r io.Reader) (*serpDesktop, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &desktopSerp{}
+	res := &serpDesktop{}
 	resultStats := doc.Find("div#result-stats")
 	matches := regexp.MustCompile(`\d+(,\d+)*`).FindAllString(resultStats.Text(), -1)
 	if len(matches) > 0 {

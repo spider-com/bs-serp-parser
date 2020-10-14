@@ -7,7 +7,7 @@ import (
 )
 
 func ParseJSON(r io.Reader) (res []byte, err error) {
-	v, err := parse(r)
+	v, err := parseDesktop(r)
 	if err != nil {
 		return
 	}
@@ -21,6 +21,12 @@ func ParsePage(r io.Reader, f i.PageFormat) ([]byte, error) {
 		{
 			return ParseJSON(r)
 		}
+	case i.TabletPage:
+		v, err := parseTablet(r)
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal(v)
 	case i.MobilePage:
 		{
 			v, err := parseMobile(r)
