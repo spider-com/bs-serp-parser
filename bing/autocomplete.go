@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func parseAutocomplete(r io.Reader) (res []string, err error) {
+func ParseAutocomplete(r io.Reader) (res []string, err error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err

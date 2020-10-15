@@ -11,7 +11,7 @@ func TestAutocomplete(t *testing.T) {
 	f, err := ioutil.ReadFile("./autocomplete.html")
 	require.Nil(t, err)
 
-	res, err := parseAutocomplete(bytes.NewReader(f))
+	res, err := ParseAutocomplete(bytes.NewReader(f))
 	require.Nil(t, err)
 	require.Equal(t, 8, len(res))
 	require.Equal(t, "pizza", res[0])

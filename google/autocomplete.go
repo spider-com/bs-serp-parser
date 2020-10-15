@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func parseAutocomplete(r io.Reader) (res []string, err error) {
+func ParseAutocomplete(r io.Reader) (res []string, err error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return
