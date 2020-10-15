@@ -8,10 +8,10 @@ import (
 )
 
 func TestParseMobile(t *testing.T) {
-	googleDoc, err := ioutil.ReadFile("./mobile.html")
+	f, err := ioutil.ReadFile("./mobile.html")
 	require.Nil(t, err)
 
-	res, err := parseMobile(bytes.NewReader(googleDoc))
+	res, err := parseMobile(bytes.NewReader(f))
 	require.Nil(t, err)
 
 	// some pages with ads don't have result count
