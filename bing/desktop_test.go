@@ -8,10 +8,10 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	googleDoc, err := ioutil.ReadFile("./desktop.html")
+	f, err := ioutil.ReadFile("./desktop.html")
 	require.Nil(t, err)
 
-	res, err := parse(bytes.NewReader(googleDoc))
+	res, err := parse(bytes.NewReader(f))
 	require.Nil(t, err)
 
 	// some pages with ads don't have result count

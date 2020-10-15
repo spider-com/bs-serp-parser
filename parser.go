@@ -14,3 +14,4 @@ var (
 
 type ParseJSON func(r io.Reader) ([]byte, error)
 type ParsePage func(r io.Reader, f PageFormat) ([]byte, error)
+type ParseAutocomplete func(r io.Reader) ([]string, error)
